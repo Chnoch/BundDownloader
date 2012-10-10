@@ -39,7 +39,6 @@ public class SignServlet extends HttpServlet {
         greeting.setProperty("user", user);
         greeting.setProperty("date", date);
         greeting.setProperty("content", content);
-
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(greeting);
 
