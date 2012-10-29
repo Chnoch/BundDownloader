@@ -17,10 +17,16 @@ package ch.chnoch.appengine.bunddownloader;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+
 
 /**
  * Servlet to check that the current user is authorized and to serve the start
@@ -45,8 +51,14 @@ public class StartPageServlet extends BundDownloaderServlet {
 		} catch (RuntimeException e) {
 			return;
 		}
-		// Deserialize the state in order to specify some values to the DrEdit
-		// JavaScript client below.
-		resp.sendRedirect("/downloader.jsp");
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		Entity subscriber = new Entity("Subscriber");
+		subscriber.setProperty("userId", getClientId(req, resp));
+		subscriber.setProperty("date", new Date());
+		datastore.put(subscriber);
+		
+		resp.sendRedirect("/success.jsp");
 	}
 }

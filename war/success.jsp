@@ -19,12 +19,9 @@
 
   <body>
 
-    <h2>Willkommen</h2>
+    <h2>Bravo</h2>
     
-    <div id="content">Willkommensseite für den Bund Downloader. Der untenstehende Link aktiviert den täglichen Download des Bunds direkt in Google Drive.</div>
-    <a href="/start">Download aktivieren</a>
+    <div id="content">Der Download wurde aktiviert und wird nun jeden Morgen um 7 Uhr durchgeführt.</div>  
     
-    
-
   </body>
 </html>

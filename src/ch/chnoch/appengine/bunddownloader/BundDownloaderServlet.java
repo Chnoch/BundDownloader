@@ -8,6 +8,8 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
+import org.mortbay.log.Log;
+
 import ch.chnoch.appengine.bunddownloader.CredentialMediator.InvalidClientSecretsException;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -31,94 +33,93 @@ public class BundDownloaderServlet extends HttpServlet {
 
 	private static String REDIRECT_URI = "http://localhost/oauth2callback";
 
-	 public void doGet(HttpServletRequest req, HttpServletResponse resp)
-	 throws IOException, ServletException {
-//	 UserService userService = UserServiceFactory.getUserService();
-//	 User user = userService.getCurrentUser();
-	 InputStream is = null;
-	 try {
-	 // URL url1 = new
-	 // URL("http://epaper.derbund.ch/getAll.asp?d=03102012");
-	 //
-	 // byte[] ba1 = new byte[1024];
-	 // int baLength;
-	 // ArrayList<Byte> list = new ArrayList<Byte>();
-	 //
-	 // URLConnection urlConnection = url1.openConnection();
-	 // urlConnection.setConnectTimeout(20000);
-	 // long size = urlConnection.getContentLengthLong();
-	 // System.out.println("Size of stream: " + size);
-	 // urlConnection.
-	 // is = url1.openStream();
-	 // while ((baLength = is.read(ba1)) != -1) {
-	 // for (Byte b : ba1) {
-	 // list.add(b);
-	 // }
-	 // }
-	
-	 HttpTransport httpTransport = new NetHttpTransport();
-	 JsonFactory jsonFactory = new JacksonFactory();
-	
-//	 GoogleAuthorizationCodeFlow flow = new
-//	 GoogleAuthorizationCodeFlow.Builder(
-//	 httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET,
-//	 Arrays.asList(DriveScopes.DRIVE)).setAccessType("online")
-//	 .setApprovalPrompt("auto").build();
-	
-	 GoogleAuthorizationCodeRequestUrl urlBuilder = new
-	 GoogleAuthorizationCodeRequestUrl(
-	 CLIENT_ID, REDIRECT_URI, Arrays.asList(DriveScopes.DRIVE))
-	 .setAccessType("offline").setApprovalPrompt("force");
-	 urlBuilder.set("user_id", "chnoch@gmail.com");
-	 String url = urlBuilder.build();
-	
-	 // String url = flow.newAuthorizationUrl()
-	 // .setRedirectUri(REDIRECT_URI).build();
-	 System.out.println("URL: " + url);
-//	 resp.sendRedirect(url);
-	 // System.out
-	 //
-//	 .println("Please open the following URL in your browser then type the authorization code:");
-	 // System.out.println("  " + url);
-	 // BufferedReader br = new BufferedReader(new InputStreamReader(
-	 // System.in));
-	 // String code = br.readLine();
-	 //
-	 // GoogleTokenResponse response = flow.newTokenRequest(code)
-	 // .setRedirectUri(REDIRECT_URI).execute();
-	 // GoogleCredential credential = new GoogleCredential()
-	 // .setFromTokenResponse(response);
-	 //
-	 // // Create a new authorized API client
-	 // Drive service = new Drive.Builder(httpTransport, jsonFactory,
-	 // credential).build();
-	 //
-	 // // Insert a file
-	 // File body = new File();
-	 // body.setTitle("My document");
-	 // body.setDescription("A test document");
-	 // body.setMimeType("text/plain");
-	 //
-	 // java.io.File fileContent = new java.io.File("document.txt");
-	 // FileContent mediaContent = new FileContent("text/plain",
-	 // fileContent);
-	 //
-	 // File file = service.files().insert(body, mediaContent).execute();
-	 //
-	 } catch (Exception e) {
-	 e.printStackTrace();
-	 } finally {
-	
-	 // is.close();
-	 }
-	 //
-	 // if (user != null) {
-	 // resp.setContentType("text/plain");
-	 // resp.getWriter().println("Hello, " + user.getNickname());
-	 // } else {
-	 // resp.sendRedirect(userService.createLoginURL(req.getRequestURI()));
-	 // }
-	 }
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException, ServletException {
+		// UserService userService = UserServiceFactory.getUserService();
+		// User user = userService.getCurrentUser();
+		InputStream is = null;
+		try {
+			// URL url1 = new
+			// URL("http://epaper.derbund.ch/getAll.asp?d=03102012");
+			//
+			// byte[] ba1 = new byte[1024];
+			// int baLength;
+			// ArrayList<Byte> list = new ArrayList<Byte>();
+			//
+			// URLConnection urlConnection = url1.openConnection();
+			// urlConnection.setConnectTimeout(20000);
+			// long size = urlConnection.getContentLengthLong();
+			// System.out.println("Size of stream: " + size);
+			// urlConnection.
+			// is = url1.openStream();
+			// while ((baLength = is.read(ba1)) != -1) {
+			// for (Byte b : ba1) {
+			// list.add(b);
+			// }
+			// }
+
+			HttpTransport httpTransport = new NetHttpTransport();
+			JsonFactory jsonFactory = new JacksonFactory();
+
+			// GoogleAuthorizationCodeFlow flow = new
+			// GoogleAuthorizationCodeFlow.Builder(
+			// httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET,
+			// Arrays.asList(DriveScopes.DRIVE)).setAccessType("online")
+			// .setApprovalPrompt("auto").build();
+
+			GoogleAuthorizationCodeRequestUrl urlBuilder = new GoogleAuthorizationCodeRequestUrl(
+					CLIENT_ID, REDIRECT_URI, Arrays.asList(DriveScopes.DRIVE))
+					.setAccessType("offline").setApprovalPrompt("force");
+			urlBuilder.set("user_id", "chnoch@gmail.com");
+			String url = urlBuilder.build();
+
+			// String url = flow.newAuthorizationUrl()
+			// .setRedirectUri(REDIRECT_URI).build();
+			System.out.println("URL: " + url);
+			// resp.sendRedirect(url);
+			// System.out
+			//
+			// .println("Please open the following URL in your browser then type the authorization code:");
+			// System.out.println("  " + url);
+			// BufferedReader br = new BufferedReader(new InputStreamReader(
+			// System.in));
+			// String code = br.readLine();
+			//
+			// GoogleTokenResponse response = flow.newTokenRequest(code)
+			// .setRedirectUri(REDIRECT_URI).execute();
+			// GoogleCredential credential = new GoogleCredential()
+			// .setFromTokenResponse(response);
+			//
+			// // Create a new authorized API client
+			// Drive service = new Drive.Builder(httpTransport, jsonFactory,
+			// credential).build();
+			//
+			// // Insert a file
+			// File body = new File();
+			// body.setTitle("My document");
+			// body.setDescription("A test document");
+			// body.setMimeType("text/plain");
+			//
+			// java.io.File fileContent = new java.io.File("document.txt");
+			// FileContent mediaContent = new FileContent("text/plain",
+			// fileContent);
+			//
+			// File file = service.files().insert(body, mediaContent).execute();
+			//
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			// is.close();
+		}
+		//
+		// if (user != null) {
+		// resp.setContentType("text/plain");
+		// resp.getWriter().println("Hello, " + user.getNickname());
+		// } else {
+		// resp.sendRedirect(userService.createLoginURL(req.getRequestURI()));
+		// }
+	}
 
 	protected static final HttpTransport TRANSPORT = new NetHttpTransport();
 	protected static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -145,11 +146,10 @@ public class BundDownloaderServlet extends HttpServlet {
 	 */
 	public static final List<String> SCOPES = Arrays.asList(
 			// Required to access and manipulate files.
-			"https://www.googleapis.com/auth/drive"
+			"https://www.googleapis.com/auth/drive",
 			// Required to identify the user in our data store.
-//			"https://www.googleapis.com/auth/userinfo.email",
-//			"https://www.googleapis.com/auth/userinfo.profile"
-			);
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile");
 
 	protected void sendError(HttpServletResponse resp, int code, String message) {
 		try {
@@ -200,6 +200,17 @@ public class BundDownloaderServlet extends HttpServlet {
 		}
 	}
 
+	protected CredentialMediator getCredentialMediatorFromUserId(String userId)
+			throws Exception {
+		// Authorize or fetch credentials. Required here to ensure this happens
+		// on first page load. Then, credentials will be stored in the user's
+		// session.
+		CredentialMediator mediator;
+		mediator = new CredentialMediator(getClientSecretsStream(), SCOPES);
+		mediator.getCredentialFromUserID(userId);
+		return mediator;
+	}
+
 	protected Credential getCredential(HttpServletRequest req,
 			HttpServletResponse resp) {
 		try {
@@ -219,6 +230,17 @@ public class BundDownloaderServlet extends HttpServlet {
 					e.getMessage());
 			sendError(resp, 500, message);
 			throw new RuntimeException(message);
+		}
+		return null;
+	}
+
+	protected Credential getCredentialFromUserID(String userID) {
+		try {
+
+			CredentialMediator mediator = getCredentialMediatorFromUserId(userID);
+			return mediator.getActiveCredential();
+		} catch (Exception e) {
+			Log.warn("No token for user " + userID, e);
 		}
 		return null;
 	}

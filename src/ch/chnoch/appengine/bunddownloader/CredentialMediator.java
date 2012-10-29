@@ -108,6 +108,19 @@ public class CredentialMediator {
           "client_secrets.json is missing or invalid.");
     }
   }
+  
+  public CredentialMediator(InputStream clientSecretsStream, Collection<String> scopes)
+				  throws InvalidClientSecretsException {
+	  this.scopes = scopes;
+	  this.credentialStore = new AppEngineCredentialStore();
+	  try {
+		  secrets = GoogleClientSecrets.load(
+				  JSON_FACTORY, clientSecretsStream);
+	  } catch (IOException e) {
+		  throw new InvalidClientSecretsException(
+				  "client_secrets.json is missing or invalid.");
+	  }
+  }
 
   /**
    * @return Client information parsed from client_secrets.json.
@@ -325,6 +338,64 @@ public class CredentialMediator {
       e.printStackTrace();
     }
     return credential;
+  }
+  
+  public Credential getCredentialFromUserID(String userId) throws NoRefreshTokenException, IOException {
+	  Credential credential = null;
+	  try {
+		  // Only bother looking for a Credential if the user has an existing
+		  // session with their email address stored.
+		  if (userId != null) {
+			  credential = getStoredCredential(userId);
+		  }
+		  
+		  // No Credential was stored for the current user or no refresh token is
+		  // available.
+		  // If an authorizationCode is present, upgrade it into an
+		  // access token and hopefully a refresh token.
+		  if ((credential == null || credential.getRefreshToken() == null)
+				  && request.getParameter("code") != null) {
+			  credential = exchangeCode(request.getParameter("code"));
+			  if (credential != null) {
+				  Userinfo userInfo = getUserInfo(credential);
+				  userId = userInfo.getId();
+				  request.getSession().setAttribute(USER_ID_KEY, userId);
+				  request.getSession().setAttribute(EMAIL_KEY, userInfo.getEmail());
+				  // Sometimes we won't get a refresh token after upgrading a code.
+				  // This won't work for our app, because the user can land directly
+				  // at our app without first visiting Google Drive. Therefore,
+				  // only bother to store the Credential if it has a refresh token.
+				  // If it doesn't, we'll get one below.
+				  if (credential.getRefreshToken() != null) {
+					  credentialStore.store(userId, credential);
+				  }
+			  }
+		  }
+		  
+		  if (credential == null || credential.getRefreshToken() == null) {
+			  // No refresh token has been retrieved.
+			  // Start a "fresh" OAuth 2.0 flow so that we can get a refresh token.
+			  String email = (String) request.getSession().getAttribute(EMAIL_KEY);
+			  email = "chnoch@gmail.com";
+			  String authorizationUrl = getAuthorizationUrl(email);
+			  System.out.println("AuthURL: " + authorizationUrl);
+			  throw new NoRefreshTokenException(authorizationUrl);
+		  }
+	  } catch (CodeExchangeException e) {
+		  // The code the user arrived here with was bad.  This pretty much never
+		  // happens. In a production application, we'd either redirect the user
+		  // somewhere like a home page, or show them a vague error mentioning
+		  // that they probably didn't arrive to our app from Google Drive.
+		  e.printStackTrace();
+	  } catch (NoUserIdException e) {
+		  // This is bad because it means the user either denied us access
+		  // to their email address, or we couldn't fetch it for some reason.
+		  // This is unrecoverable. In a production application, we'd show the
+		  // user a message saying that we need access to their email address
+		  // to work.
+		  e.printStackTrace();
+	  }
+	  return credential;
   }
 
   /**
